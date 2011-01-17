@@ -25,7 +25,7 @@
         body {
             font: 12px/1.5 sans-serif;
         }
-        form {
+        fieldset {
             width: 350px;
             border: 1px dotted #888;
             padding: 10px;
@@ -36,6 +36,42 @@
             margin: 5px 0;
             padding: 3px 5px;
         }
+        .placeholder {}
+        table {
+            border-collapse: collapse;
+            border: 1px solid #aaa;
+            width: 60%;
+            margin: 0 0 1.5em 0;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            radius: 5px;
+        }
+        table caption {
+            text-align: left;
+        }
+        th, tr {
+            border-bottom: 1px dotted #aaa;
+        }
+        tr.alt {
+            background: #eee;
+        }
+        thead {
+            background: #ccc;
+        }
+        col {
+            border: 1px dotted #aaa;
+            border-width: 0 1px;
+        }
+        table td {
+            padding: 2px 5px;
+            vertical-align: top;
+        }
+        col.params {}
+        col.types {
+            font-style: italic;
+        }
+        col.defaults {}
+        col.descs {}
     </style>
 </head>
 
@@ -43,24 +79,98 @@
 
   <div id="container">
     <header>
+        <h1>htmlV field placeholder plugin</h1>
     </header>
 
     <div id="main" role="main">
-        <form action="#">
-        	<input id='field1' type="text" placeholder='Field1' />
-        	<input id='field2' type="text" placeholder='Field2' />
-        	<input type="text" placeholder='Field3' />
-        	<input type="text" placeholder='Field4' />
-        	<select name="select" id="select">
-        		<option value="1">1</option>
-        		<option value="2">2</option>
-        		<option value="3">3</option>
-        		<option value="4">4</option>
-        	</select>
-            <input type="button" value='submit' />
-            <input type="reset" value='Reset' />
+    <h2>Introduction</h2>
+    <p>This is the documentation</p>
+    
+    <h2>Optional Parameters</h2>
+    <table summary="Options for the plugin" id="options">
+        <caption>Plugin parameters</caption>
+        <colgroup>
+        	<col class='params'/>
+        	<col class='types'/>
+        	<col class='defaults'/>
+        	<col class='descs'/>
+        </colgroup>
+     <thead>
+      <tr>
+       <th scope="col">Parameter</th>
+       <th scope="col">Type</th>
+       <th scope="col">Default</th>
+       <th scope="col">Description</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr>
+       <td>useLabels</td>
+       <td>boolean</td>
+       <td>true</td>
+       <td>
+            This option lets you specify whether to use &lt;label&gt; elements or &lt;div&gt;    to emulate your placeholder. <em>Depricated.</em>
+       </td>
+      </tr>
+      <tr>
+       <td>phClass</td>
+       <td>string</td>
+       <td>"placeholder"</td>
+       <td>
+           The class to attach to the placeholder elements so you can style them. 
+       </td>
+      </tr>
+      <tr>
+       <td>idPrefix</td>
+       <td>string</td>
+       <td>"ph-"</td>
+       <td>
+            The id prefix used on the placeholder elements. May be removed down the line in favor of data-*.
+       </td>
+      </tr>
+      <tr>
+       <td>css</td>
+       <td>object</td>
+       <td>color : '#aaa'</td>
+       <td>
+            An object containing any standard jQuery css object key/value pairs (color being the only property not stylable by your own stylesheets).
+       </td>
+      </tr>
+     </tbody>
+    </table>
+
+    <h2>Known Issues</h2>
+    <p>Because of the way I emulate native htm5 placeholder behavior, the color of the plceholder text is placed inline on the elements and can not be styled by your stylesheet. Everything else, however, can be. But you can customize the color when you setup the .placeHolder() object.</p>
+
+        <h2>Demonstration</h2>
+        <code><pre>
+$('input').placeHolder();
+        </pre></code>
+        <form action="#" id='demo1'>
+            <fieldset>
+                <legend>dummy form</legend>
+                <label for='field1'>Field ha sboth ID and placeholder</label>
+                <input id='field1' type="text" placeholder='Field1' />
+
+                <label for='field2'>Field has no placeholder</label>
+                <input id='field2' type="text" />
+
+                <label>Field has placeholder but no ID</label>
+                <input type="text" placeholder='Field3' />
+
+                <label>Field has no ID, nor placeholder</label>
+                <input type="text" />
+
+                <select name="select" id="select">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+                <input type="button" value='submit' />
+                <input type="reset" value='Reset' />
+            </fieldset>
         </form>
-        <p class='note'>Still need to incorporate label integration (placeholder Defaults?)</p>
     </div>
 
     <footer>
@@ -75,7 +185,8 @@
   <script>!window.jQuery && document.write(unescape('%3Cscript src="js/libs/jquery-1.4.4.js"%3E%3C/script%3E'))</script>
   <script src="../src/jquery.htmlv.field.placeholder.js"></script>
   <script>
-    $('input[placeholder]').placeHolder();
+    $('input').placeHolder();
+    $('tbody tr:odd').addClass('alt');
   </script>
 </body>
 </html>

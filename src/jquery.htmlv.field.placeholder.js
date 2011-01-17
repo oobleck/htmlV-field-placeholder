@@ -17,41 +17,45 @@
     $.fn.placeHolder = function(options) {
         // instead of selecting a static cont with 
         // $("#rating"), we now use the jQuery context
-        var cont = this, conf = {},
-            settings, init, phShow, phHide, phToggle, dummy;
+        var cont = this, config,
+            init, phShow, phHide, phToggle, dummy;
 
         // Stop here if the browser supports 'placeholder'
         dummy = document.createElement('input');
         if ('placeholder' in dummy) {return this;}
 
-        settings = $.extend({
+        config = $.extend({
             // Defaults
+            css : {
+                //outline : '1px solid red',
+                color : '#aaa',
+                position : 'absolute',
+                background : 'transparent',
+                overflow : 'hidden'
+            },
             phClass : 'placeholder',
-            phColor : '#aaa'
-        }, options);
-
-        conf = {
             idPrefix : 'ph-',
-            phClass : settings.phClass
-        };
+            useLabels : true,
+            ifBrowserSupportsPh : false,
+            initialized : false
+        }, options);
 
         // The methods
         init = function() {
-            $(this).parent('form').css({'position':'relative'});
             cont.each(function() {
                 var $this   = $(this), pHolder,
                     fieldId = $this.attr('id') || Math.floor(Math.random()*9999), // see if this can be done smarter with jQ data methods
-                    phId    = conf.idPrefix + fieldId;
+                    fieldLabel = $('label[for='+fieldId+']'),
+                    phId    = config.idPrefix + fieldId,
+                    ph      = (config['useLabels']) ? 'label' : 'div',
+                    phText  = $this.attr('placeholder') || fieldLabel.text();
 
-                    if (!$this.attr('id')) {
-                        $(this).attr('id', fieldId);
-                    }
-                    $('<div class="'+settings.phClass+'" id="'+phId+'">'+$this.attr('placeholder')+'</div>').insertAfter($this);
-                    $('#'+phId).css({
-                        'position' : 'fixed',
+                    //$this.parent().css({'position':'relative'});
+                    pHolder = $('<'+ph+' class="'+config.phClass+'" id="'+phId+'">'+phText+'</'+ph+'>').insertAfter($this);
+
+                    pHolder.css($.extend({
                         'width' : $this.css('width'),
-                        'color' : settings.phColor,
-                        'backgroundColor' : 'transparent',
+                        'height' : $this.css('height'),
                         'paddingLeft'  : $this.css('paddingLeft'),
                         'paddingRight' : $this.css('paddingRight'),
                         'paddingTop'  : $this.css('paddingTop'),
@@ -62,53 +66,43 @@
                         'marginBottom'  : $this.css('marginBottom'),
                         'left' : $this.position().left,
                         'top' : $this.position().top
-                    });
+                    }, config.css));
+                    config['useLabels'] && pHolder.attr('for', fieldId);
+                    !$this.attr('id') && $(this).attr('id', fieldId);
             });
-            conf.initialized = true;
+            config.initialized = true;
         };
-        phShow = function() {
+        phShow = function(el) {
             var $this = $(this),
-                id    = $this.attr('id').split(conf.idPrefix)[1] || $this.attr('id');
-                
-                console.log('showing '+id);
-                $('#'+id).show();
-        };
-        phHide = function() {
-            var $this = $(this),
-                id    = $this.attr('id').split(conf.idPrefix)[1] || $this.attr('id');
-                
-                console.log('hiding '+id);
-                $('#'+id).hide();
-        };
-        phToggle = function(el) {
-            var $this = $(this),
-                fieldId = el.attr('id').split(conf.idPrefix)[1];
+                fieldId = el.attr('id').split(config.idPrefix)[1];
             
-            if ($('#'+fieldId).val() === '') {
-                el.toggle();
-            }
+            !$('#'+fieldId).val() && el.show();
+        };
+        phHide = function(el) {
+            var $this = $(this),
+                fieldId = el.attr('id').split(config.idPrefix)[1];
+            
+            !$('#'+fieldId).val() && el.hide();
         };
 
         // Events handlers
-        $(document).delegate('input[placeholder]', 'blur', function (e) {
-            var phElement = $('#'+conf.idPrefix+$(this).attr('id'));
-            phToggle(phElement);
+        $(document).delegate('input', 'blur', function (e) {
+            var phElement = $('#'+config.idPrefix+$(this).attr('id'));
+            phShow(phElement);
         });
-        $(document).delegate('input[placeholder]', 'focus', function (e) {
-            var phElement = $('#'+conf.idPrefix+$(this).attr('id'));
-            phToggle(phElement);
+        $(document).delegate('input', 'focus', function (e) {
+            var phElement = $('#'+config.idPrefix+$(this).attr('id'));
+            phHide(phElement);
         });
-        $(document).delegate('.'+settings.phClass, 'click', function (e) {
-            var fieldId = $(this).attr('id').split(conf.idPrefix)[1] || $(this).attr('id');
-            //  phHide();
-            $('input#'+fieldId).focus();
-        });
+        if (!config['useLabels']) {
+            $(document).delegate('.'+config.phClass, 'click', function (e) {
+                var fieldId = $(this).attr('id').split(config.idPrefix)[1] || $(this).attr('id');
+                $('input#'+fieldId).focus();
+            });
+        }
         
         // Initialize if not already
-        if (!conf.initialized) {
-            init();
-            //console.log('initialized');
-        }
+        !config.initialized && init();
         return this;
     };
 }(jQuery, this, this.document, false));
